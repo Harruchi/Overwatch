@@ -1,0 +1,316 @@
+; <COMPILER: v1.1.24.01>
+guif:
+#NoEnv
+#SingleInstance force
+SkinForm(Apply, A_ScriptDir . "\USkin.dll", A_ScriptDir . "\Milikymac.msstyles")
+Gui, Add, Text, x12 y40 w200 h30 , 1280*720  Run Aim[F1]
+Gui, Add, Text, x12 y60 w200 h30 , 1920*1080 Run Aim[F2]
+Gui, Add, Text, x12 y80 w200 h30 ,  Restart Program[F3]
+Gui, Add, Text, x12 y100 w200 h30 ,  Pause/Resume[ALT]
+Gui, Add, CheckBox, x12 y130 w180 h40 vmccree, Mccree Right Click No Recoil
+Gui, Add, CheckBox, x12 y160 w150 h40 vtorbjorn, Torbjorn Fast Reload
+Gui, Add, CheckBox, x12 y190 w150 h40 vpharah, Pharah Fast Reload
+Gui, Add, CheckBox, x12 y220 w150 h40 vreaper, Reaper Fast Reload
+Gui, Add, CheckBox, x12 y250 w150 h40 vroadhog, RoadHog Fast Reload
+Gui, Add, CheckBox, x292 y25 w150 h40 vaimtype Checked, Left Click AimLock
+Gui, Add, CheckBox, x292 y55 w150 h40 vaimtype1, Right Click Aimlock
+Gui, Add, Text, x232 y110 w120 h30 , Aim speed control
+Gui, Add, Edit, x362 y110 w100 h30 vrx, 3
+Gui, Add, Button, x232 y150 w230 h90 gchange1, Apply settings
+gui, add, button, x5 y5 h20 w70 gsub1, Issues?
+gui, add, button, x80 y5 h20 w70 gsub2, How-to
+gui, add, button, x155 y5 h20 w70 gsub3, Best Settings
+gui, add, button, x225 y5 h20 w100 gsub4, About Aim Speed!
+Gui, Show
+Loop {
+Gui, Submit, NoHide
+Sleep -1
+}
+Return
+#If roadhog=1
+$r::
+Send {r}
+Sleep 1880
+Send {v}
+Return
+#If
+Return
+#If torbjorn=1
+$r::
+Send {r}
+Sleep 1780
+Send {v}
+Return
+#If
+Return
+#If pharah=1
+$r::
+Send {r}
+Sleep 1200
+Send {v}
+Return
+#If
+return
+#If reaper=1
+$r::
+Send {r}
+Sleep 300
+Send {v}
+Return
+#If
+return
+#If mccree=1
+~RButton::
+Loop
+If GetKeyState("RButton") {
+Sleep, 5
+moveAmount := (moveAmount = 2) ? 3 : 0
+mouseXY(moveAmount,3.4)
+}
+else
+break
+Return
+mouseXY(x,y)
+{
+DllCall("mouse_event",int,1,int,x,int,y,uint,0,uint,0)
+}
+#If
+return
+sub1:
+{
+msgbox, Having issues?`n`nMccree Right Click No Recoil Does NOT!!! work with right click aimlock`nHOLD DOWN RIGHT CLICK FOR IT TO WORK DONT JUST PRESS BUTTON`n`nCheat is CPU intensive and only uses math.`n`nLowFPS: Lower Aim speed to 3.`nLowFPS: Lower resolution to 720p and play on low.`nLowFPS: If you get low fps after a playthrough, press F3 to restart the cheat.`n`nCursor jumping left or right when using Aim key?`n`nJumpBug:Your PC is lagging out when using Aimkey. Check LowFPS solution.`nJumpBug: Switch your resolution to 720p but use F2(1080p) with Aim Speed 3.`n`nAlways try the cheat out in Practice Range to find your best settings.
+}
+return
+sub2:
+{
+msgbox, How-to:`n`nLaunch Game. Switch to Borderless Windowed mode.`nResolution has to be 720p or 1080p. As precaution, set your quality settings to Low.`n`nTo-use:`nPress F1 or F2 depending on your resolution.`nShoot an Enemy. When the Health Bar is visible press the aimkey to snap onto the target.`n`nIf nothing is happening make sure you are not using any desktop applications that alter your color settings or are recording your gameplay such as W10 DVR or Fraps.
+}
+return
+sub3:
+{
+msgbox, Best Settings for the cheat (Legit):`n`nResolution: 1280x720`nAim Speed: 3
+}
+return
+sub4:
+{
+msgbox, Higher the number, Faster the it locks on. `n`Lower the number, The slower it locks on.
+}
+return
+GuiClose:
+ExitApp
+return
+SkinForm(Param1 = "Apply", DLL = "", SkinName = ""){
+if(Param1 = Apply){
+DllCall("LoadLibrary", str, DLL)
+DllCall(DLL . "\USkinInit", Int,0, Int,0, AStr, SkinName)
+}else if(Param1 = 0){
+DllCall(DLL . "\USkinExit")
+}
+}
+Change1:
+MsgBox,  Applied
+Gui,Submit, Nohide
+return
+F1::
+#Persistent
+#KeyHistory, 0
+#NoEnv
+#HotKeyInterval 1
+#MaxHotkeysPerInterval 127
+#InstallKeybdHook
+#UseHook
+#SingleInstance, Force
+SetKeyDelay,-1, 8
+SetControlDelay, -1
+SetMouseDelay, 0
+SetWinDelay,-1
+SendMode, InputThenPlay
+SetBatchLines,-1
+ListLines, Off
+CoordMode, Mouse, Screen
+PID := DllCall("GetCurrentProcessId")
+Process, Priority, %PID%, Normal
+ZeroX := 640
+ZeroY := 360
+CFovX := 320
+CFovY := 200
+ScanL := 500
+ScanR := 800
+ScanT := 180
+ScanB := 400
+GuiControlget, rX
+Loop, {
+if (aimtype=1)
+{
+GetKeyState, Mouse2, LButton, P
+GoSub MouseMoves2
+}
+Gui,Submit, Nohide
+if (aimtype1=1)
+{
+GetKeyState, Mouse2, RButton, P
+GoSub MouseMoves2
+}
+ImageSearch, AimPixelX, AimPixelY,ScanL, ScanT, ScanR, ScanB,  *4 hhp.bmp
+GoSub GetAimOffset
+GoSub GetAimMoves
+}
+MouseMoves:
+If ( Mouse2 == "D" ) {
+DllCall("mouse_event", uint, 1, int, MoveX, int, MoveY, uint, 0, int, 0)
+}
+Return
+MouseMoves1:
+If ( Mouse2 == "U" ) {
+DllCall("mouse_event", uint, 1, int, MoveX, int, MoveY, uint, 0, int, 0)
+}
+Return
+GetAimOffset:
+Gui,Submit, Nohide
+AimX := AimPixelX - ZeroX +41
+AimY := AimPixelY - ZeroY +63
+If ( AimX+5 > 0) {
+DirX := rx / 10
+}
+If ( AimX+5 < 0) {
+DirX := (-rx) / 10
+}
+If ( AimY+2 > 0 ) {
+DirY := rX /10 *0.5
+}
+If ( AimY+2 < 0 ) {
+DirY := (-rx) /10 *0.5
+}
+AimOffsetX := AimX * DirX
+AimOffsetY := AimY * DirY
+Return
+GetAimMoves:
+RootX := Ceil(( AimOffsetX ** ( 1/2 )))
+RootY := Ceil(( AimOffsetY ** ( 1/2 )))
+MoveX := RootX * DirX
+MoveY := RootY * DirY
+Return
+SleepF:
+SleepDuration = 1
+TimePeriod = 1
+DllCall("Winmm\timeBeginPeriod", uint, TimePeriod)
+Iterations = 1
+StartTime := A_TickCount
+Loop, %Iterations% {
+DllCall("Sleep", UInt, TimePeriod)
+}
+DllCall("Winmm\timeEndPeriod", UInt, TimePeriod)
+Return
+DebugTool:
+MouseGetPos, MX, MY
+ToolTip, %AimOffsetX% | %AimOffsetY%
+ToolTip, %AimX% | %AimY%
+ToolTip, %IntAimX% | %IntAimY%
+ToolTip, %RootX% | %RootY%
+ToolTip, %MoveX% | %MoveY% || %MX% %MY%
+Return
+F2::
+#Persistent
+#KeyHistory, 0
+#NoEnv
+#HotKeyInterval 1
+#MaxHotkeysPerInterval 2000
+#InstallKeybdHook
+#UseHook
+#SingleInstance, Force
+SetKeyDelay,-1, 8
+SetControlDelay, -1
+SetMouseDelay, 0
+SetWinDelay,-1
+SendMode, InputThenPlay
+SetBatchLines,-1
+ListLines, Off
+CoordMode, Mouse, Screen
+PID := DllCall("GetCurrentProcessId")
+Process, Priority, %PID%, Normal
+ZeroX := 960
+ZeroY := 540
+CFovX := 80
+CFovY := 200
+ScanL := 660
+ScanR := 1250
+ScanT := 280
+ScanB := 610
+GuiControlget, rX
+Loop, {
+Gui,Submit, Nohide
+if (aimtype=1)
+{
+GetKeyState, Mouse2, LButton, P
+GoSub MouseMoves2
+}
+if (aimtype1=1)
+{
+GetKeyState, Mouse2, RButton, P
+GoSub MouseMoves2
+}
+ImageSearch, AimPixelX, AimPixelY, ScanL, ScanT, ScanR, ScanB,  *4 hhp2.bmp
+GoSub GetAimOffset1
+GoSub GetAimMoves1
+}
+MouseMoves2:
+If ( Mouse2 == "D" ) {
+DllCall("mouse_event", uint, 1, int, MoveX, int, MoveY, uint, 0, int, 0)
+}
+Return
+MouseMoves11:
+If ( Mouse2 == "U" ) {
+DllCall("mouse_event", uint, 1, int, MoveX, int, MoveY, uint, 0, int, 0)
+}
+GetAimOffset1:
+Gui,Submit, Nohide
+AimX := AimPixelX - ZeroX +58
+AimY := AimPixelY - ZeroY +85
+If ( AimX+10 > 0) {
+DirX := rx / 10
+}
+If ( AimX+10 < 0) {
+DirX := (-rx) / 10
+}
+If ( AimY+5 > 0 ) {
+DirY := rX /10 *0.5
+}
+If ( AimY+5 < 0 ) {
+DirY := (-rx) /10 *0.5
+}
+AimOffsetX := AimX * DirX
+AimOffsetY := AimY * DirY
+Return
+GetAimMoves1:
+RootX := Ceil(( AimOffsetX ** ( 1 )))
+RootY := Ceil(( AimOffsetY ** ( 1 )))
+MoveX := RootX * DirX
+MoveY := RootY * DirY
+Return
+reload:
+SleepF1:
+SleepDuration = 1
+TimePeriod = 1
+DllCall("Winmm\timeBeginPeriod", uint, TimePeriod)
+Iterations = 1
+StartTime := A_TickCount
+Loop, %Iterations% {
+DllCall("Sleep", UInt, TimePeriod)
+}
+DllCall("Winmm\timeEndPeriod", UInt, TimePeriod)
+Return
+DebugTool1:
+MouseGetPos, MX, MY
+ToolTip, %AimOffsetX% | %AimOffsetY%
+ToolTip, %AimX% | %AimY%
+ToolTip, %IntAimX% | %IntAimY%
+ToolTip, %RootX% | %RootY%
+ToolTip, %MoveX% | %MoveY% || %MX% %MY%
+Return
+ALT::
+pause
+SoundBEEP
+return
+F3::
+Reload
+Return
